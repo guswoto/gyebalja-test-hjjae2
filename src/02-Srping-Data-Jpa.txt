@@ -1,0 +1,67 @@
+compile('org.springframework.boot:spring-boot-starter-data-jpa')
+    - 스프링 부트용 Spring Data Jpa 추상화 라이브러리
+    - 스프링 부트 버전에 맞춰 자동으로 JPA 관련 라이브러리들의 버전 관리
+
+compile('com.h2database:h2')
+    - 인메모리 관계형 DB
+    - 설치 X, 의존성만으로 관리
+    - 메모리에서 실행 ---> 애플리케이션 시작마다 초기화
+    - 용도: JPA 테스트, 로컬 환경에서의 구동
+
+
+
+@Entity
+    - 실제 DB 테이블과 매칭될 클래스
+    - 클래스의 CamelCase 이름을 언더스코어 네이밍으로 테이블 이름 매칭
+    - SalesManager.java ---> sales_manager_table
+    - Setter 없음 ---> 매우 중요
+    - 값을 변경해야 할 때 ---> 구체적인 이름을 가진 메소드로 상태를 변경
+    - setStatus() (X)
+    - cancleOrder() (O)
+
+@Id
+    - 테이블의 PK 필드
+    - 웬만하면 PK는 Long타입의 Auto_increment 추천
+
+@GeneratedValue
+    - PK의 생성 규칙
+    - 스프링 부트 2.0 부터는 GenerationType.IDENTITY 옵션을 추가해야만 auto_increment 적용
+
+@Column
+    - 테이블의 칼럼을 나타냄
+    - 굳이 선언하지 않아도 Entity 클래스의 필드는 모두 컬럼
+    - 사용 이유: 기본으로 설정된 것 바꾸기 위해
+    - 사이즈 500, 타입 text 등등
+
+
+@NoArgsConstructor
+    - 기본 생성자 자동 추가
+    - public Posts() {} 와 같은 효과
+
+
+@Builder
+    - 해당 클래스의 빌더 패턴 클래스 생성
+    - 생성자 상단에 선언 시 생성자에 포함된 필드만 빌더에 포함
+    - 어떤 필드에 어떤 값을 채워야할지 명확하게 함
+
+
+
+Entity ---> JpaRepository <<interface>> (Entity 클래스로 DB 접근하게 해줌)
+
+
+@After
+    - Junit에서 단위 테스트가 끝날 때마다 수행되는 메소드 지정
+    - 보통은 배포 전 전체 테스트를 수행할 때 테스트간 데이터 침범을 막기 위해 사용
+    - 여러 테스트가 동시에 수행되면 테스트용 디비 H2에 데이터가 그대로 남아 다음 테스트 실행 시에 테스트 실패할 수 있음
+
+postsRepository.save()
+    - 테이블 posts 에 insert/update 쿼리 실행
+    - id 값 있으면 update
+
+postsRepository.findAll()
+    - 테이블 posts 에 있는 모든 데이터를 조회해오는 메소드
+
+
+
+@SpringBootTest
+    - 별다른 설정이 없다면 H2 데이터베이스를 자동으로 실행해 줌
